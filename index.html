@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kisan Smart Farmer ID Generator</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #eef2f3; text-align: center; padding: 20px; margin: 0; }
+        .form-container { max-width: 480px; background: white; padding: 25px; margin: 20px auto; border-radius: 12px; box-shadow: 0px 5px 20px rgba(0,0,0,0.15); border-top: 5px solid #2e7d32; }
+        .form-container h2 { color: #2e7d32; margin-bottom: 20px; font-size: 22px; }
+        input, select { width: 100%; padding: 11px; margin: 10px 0; border: 1px solid #cccccc; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+        button { background: linear-gradient(135deg, #2e7d32, #1b5e20); color: white; border: none; padding: 13px; cursor: pointer; font-size: 16px; font-weight: bold; border-radius: 6px; width: 100%; margin-top: 10px; transition: 0.3s; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        
+        /* Exact Video Layout PVC Card Styling */
+        #pvc-card { 
+            width: 85.6mm; height: 53.98mm; /* Standard CR80 PVC Size */
+            background: #ffffff; border: 1px solid #bcbcbc; border-radius: 10px; 
+            margin: 40px auto; position: relative; text-align: left; box-sizing: border-box; overflow: hidden; display: none;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+        /* Top Green Wave Header Design */
+        .card-header-wave { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 38px;
+            background: linear-gradient(135deg, #1b5e20 40%, #a3e635 85%, #2e7d32 100%);
+            border-bottom-right-radius: 40px 15px; border-bottom-left-radius: 10px 5px;
+            color: white; font-weight: bold; font-size: 17px; padding: 8px 0 0 15px; box-sizing: border-box;
+        }
+        /* Top Farmer Circular Logo */
+        .gov-logo { position: absolute; right: 10px; top: 4px; width: 30px; height: 30px; background: white; border-radius: 50%; border: 1px solid #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        
+        /* Main Body Details */
+        .card-body { padding: 45px 12px 10px 12px; font-size: 9px; color: #222222; font-weight: 600; line-height: 1.4; }
+        .info-row { margin: 2px 0; }
+        .info-row strong { color: #444; width: 70px; display: inline-block; font-size: 9.5px; }
+
+        /* Left Side Profile Photo Frame */
+        .photo-frame { width: 55px; height: 68px; border: 1.5px solid #2e7d32; border-radius: 4px; background: #f0f0f0; position: absolute; left: 15px; top: 52px; overflow: hidden; }
+        .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* Right Side Details Layout adjustments */
+        .details-block { margin-left: 68px; margin-top: 5px; width: 160px; display: inline-block; vertical-align: top; }
+
+        /* Right Side QR Code placement */
+        .qr-block { position: absolute; right: 12px; top: 52px; width: 62px; height: 62px; border: 1px solid #ddd; padding: 2px; background: white; border-radius: 4px; }
+        .qr-block img { width: 100%; height: 100%; }
+
+        /* Central Big Highlighted Aadhaar/ID Number */
+        .center-id-number { position: absolute; bottom: 22px; left: 80px; font-size: 17px; font-weight: 800; color: #1b5e20; letter-spacing: 1.5px; text-shadow: 0.5px 0.5px 0px #fff; }
+        
+        /* Bottom Warning and Footer Capsule */
+        .footer-text { position: absolute; bottom: 5px; left: 12px; font-size: 5px; color: #cc0000; font-weight: bold; width: 180px; line-height: 1.1; }
+        .footer-capsule { position: absolute; bottom: 0; right: 0; background: linear-gradient(135deg, #1b5e20, #2e7d32); color: white; padding: 4px 15px; font-size: 11px; font-weight: bold; border-top-left-radius: 12px; letter-spacing: 0.5px; }
+
+        /* Print Settings optimization */
+        @media print {
+            body * { visibility: hidden; }
+            #pvc-card, #pvc-card * { visibility: visible; }
+            #pvc-card { position: absolute; left: 0; top: 0; box-shadow: none; border: 1px solid #000; display: block !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Farmer ID Card Generator Portal</h2>
+    <input type="text" id="nameEng" placeholder="Farmer Name (English)">
+    <input type="text" id="nameLocal" placeholder="किसान का नाम (हिंदी/स्थानीय भाषा)">
+    <input type="text" id="dob" placeholder="जन्मतिथि (DD/MM/YYYY)">
+    <select id="gender"><option value="पुरुष / Male">पुरुष / Male</option><option value="महिला / Female">महिला / Female</option></select>
+    <input type="text" id="mobile" placeholder="मोबाइल नंबर (Mobile No.)">
+    <input type="text" id="farmerId" placeholder="आधार / किसान आईडी (9158 5983 4000)">
+    
+    <p style="text-align:left; font-size:12px; color:#555; margin:5px 0 0 2px;">किसान की फोटो अपलोड करें:</p>
+    <input type="file" id="photo" accept="image/*" onchange="loadPhoto(event)">
+    <button onclick="buildKisanCard()">1-Click में वीडियो जैसा कार्ड बनाएं</button>
+</div>
+
+<!-- HD PVC ID Card Output Block -->
+<div id="pvc-card">
+    <div class="card-header-wave">Agri Farmer</div>
+    <div class="gov-logo">👨‍🌾</div>
+    
+    <div class="card-body">
+        <div class="photo-frame"><img id="card-user-img" src=""></div>
+        
+        <div class="details-block">
+            <div class="info-row"><strong>Name:</strong> <span id="lbl-nameEng"></span></div>
+            <div class="info-row"><strong>नाव:</strong> <span id="lbl-nameLocal"></span></div>
+            <div class="info-row"><strong>DOB:</strong> <span id="lbl-dob"></span></div>
+            <div class="info-row"><strong>Gender:</strong> <span id="lbl-gender"></span></div>
+            <div class="info-row"><strong>मोबाइल नं:</strong> <span id="lbl-mobile"></span></div>
+        </div>
+        
+        <!-- Automatic Dummy QR Code representation -->
+        <div class="qr-block">
+            <img src="https://qrserver.com" id="card-qr">
+        </div>
+        
+        
+        <div class="center-id-number" id="lbl-bigId"></div>
+    </div>
+    
+    <div class="footer-text">टीप : हे कार्ड शेतकऱ्याच्या वैयक्तिक माहितीसाठी असून, याला कोणतीही शासकीय मान्यता नाही.</div>
+    <div class="footer-capsule">Farmer ID</div>
+</div>
+
+<script>
+    let uploadedImgBase64 = "";
+    function loadPhoto(event) {
+        let fileReader = new FileReader();
+        fileReader.onload = function() { uploadedImgBase64 = fileReader.result; }
+        fileReader.readAsDataURL(event.target.files)[0];
+    }
+
+    function buildKisanCard() {
+        // Values Mapping
+        document.getElementById('lbl-nameEng').innerText = document.getElementById('nameEng').value || "Abcd Efgh";
+        document.getElementById('lbl-nameLocal').innerText = document.getElementById('nameLocal').value || "अबक यउस कलल";
+        document.getElementById('lbl-dob').innerText = document.getElementById('dob').value || "01/06/1977";
+        document.getElementById('lbl-gender').innerText = document.getElementById('gender').value;
+        document.getElementById('lbl-mobile').innerText = document.getElementById('mobile').value || "85598340XX";
+        
+        let idVal = document.getElementById('farmerId').value || "9158 5983 4000";
+        document.getElementById('lbl-bigId').innerText = idVal;
+        
+        // Dynamic QR code generation based on Farmer ID entered
+        document.getElementById('card-qr').src = "https://qrserver.com" + encodeURIComponent(idVal);
+
+        if(uploadedImgBase64) {
+            document.getElementById('card-user-img').src = uploadedImgBase64;
+        } else {
+            document.getElementById('card-user-img').src = "https://placeholder.com";
+        }
+
+        // Display Card Box and Trigger Print Engine
+        document.getElementById('pvc-card').style.display = 'block';
+        setTimeout(function(){ window.print(); }, 500); 
+    }
+</script>
+
+</body>
+</html>
