@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UP Kisan Registry Smart Card Portal</title>
-    <!-- 100% Working Official PDF.js Engine Script -->
+    <!-- Stable Official Worker Setup -->
     <script src="https://cloudflare.com"></script>
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #eef2f3; text-align: center; padding: 20px; margin: 0; }
@@ -14,7 +14,7 @@
         input, select { width: 100%; padding: 11px; margin: 10px 0; border: 1px solid #cccccc; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
         button { background: linear-gradient(135deg, #2e7d32, #1b5e20); color: white; border: none; padding: 13px; cursor: pointer; font-size: 16px; font-weight: bold; border-radius: 6px; width: 100%; margin-top: 10px; transition: 0.3s; }
         button:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .status-msg { font-size: 13px; font-weight: bold; color: #1565c0; margin-top: 5px; }
+        .status-msg { font-size: 14px; font-weight: bold; color: #d32f2f; margin-top: 5px; background: #ffebee; padding: 5px; border-radius: 4px; display: none; }
 
         /* PVC Card Layout */
         #pvc-card { 
@@ -94,8 +94,10 @@
 </div>
 
 <script>
-    // Correct worker setup for PDF.js
+    // Self-contained library configuration 
+    const pdfjsLib = window['pdfjs-dist/build/pdf'];
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cloudflare.com';
+    
     let uploadedImgBase64 = "";
 
     function loadPhoto(event) {
@@ -104,17 +106,25 @@
         fileReader.readAsDataURL(event.target.files);
     }
 
+    function showStatus(msg, isColor = "#1565c0") {
+        let el = document.getElementById('statusMsg');
+        el.innerText = msg;
+        el.style.backgroundColor = isColor === "#1565c0" ? "#e3f2fd" : "#ffebee";
+        el.style.color = isColor;
+        el.style.display = 'block';
+    }
+
     async function extractUPPdfData(event) {
         const file = event.target.files[0];
         if (!file) return;
         
-        document.getElementById('statusMsg').innerText = "UP किसान रजिस्ट्री स्कैन हो रही है...";
+        showStatus("UP किसान रजिस्ट्री स्कैन हो रही है... कृपया रुकें");
         
         const fileReader = new FileReader();
         fileReader.onload = async function() {
             const typedarray = new Uint8Array(this.result);
             try {
-                const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                const pdf = await pdfjsLib.getDocument({data: typedarray}).promise;
                 let textSegments = [];
                 
                 const page = await pdf.getPage(1);
@@ -125,10 +135,10 @@
                     }
                 });
                 
-                document.getElementById('statusMsg').innerText = "UP लखनऊ डेटा सफलतापूर्वक लोड हुआ!";
+                showStatus("UP लखनऊ डेटा सफलतापूर्वक लोड हुआ!", "#2e7d32");
                 processUPFormat(textSegments);
             } catch (error) {
-                document.getElementById('statusMsg').innerText = "त्रुटि: PDF फ़ाइल लोड नहीं हो सकी।";
+                showStatus("त्रुटि: ब्राउज़र रीफ्रेश करके दोबारा अपलोड करें।", "#d32f2f");
                 console.error(error);
             }
         };
@@ -138,30 +148,23 @@
     function processUPFormat(segments) {
         let fullCombinedText = segments.join(" ");
         
-        // 1. Extract 12 Digit ID
         let idMatch = fullCombinedText.match(/\b\d{12}\b/) || fullCombinedText.match(/\b\d{4}\s\d{4}\s\d{4}\b/);
         if(idMatch) document.getElementById('farmerId').value = idMatch[0];
 
-        // 2. Extract Mobile
         let mobMatch = fullCombinedText.match(/\b[6-9]\d{9}\b/);
         if(mobMatch) document.getElementById('mobile').value = mobMatch[0];
 
-        // 3. Extract DOB
         let dobMatch = fullCombinedText.match(/\b\d{2}\/\d{2}\/\d{4}\b/);
         if(dobMatch) document.getElementById('dob').value = dobMatch[0];
 
-        // 4. Extract Names
         for(let i = 0; i < segments.length; i++) {
             let currentStr = segments[i].replace(/[:]/g, "").trim();
-            if(currentStr.includes("कृषक का नाम") || currentStr.includes("Farmer Name")) {
-                document.getElementById('nameEng').value = segments[i+1] ? segments[i+1].replace(/[:]/g, "").trim() : "";
+            if(currentStr === "कृषक का नाम" || currentStr === "Farmer Name") {
+                if(segments[i+1]) document.getElementById('nameEng').value = segments[i+1].replace(/[:]/g, "").trim();
             }
             if(currentStr.includes("पिता") || currentStr.includes("पति का नाम") || currentStr.includes("Father")) {
-                document.getElementById('fatherEng').value = segments[i+1] ? segments[i+1].replace(/[:]/g, "").trim() : "";
+                if(segments[i+1]) document.getElementById('fatherEng').value = segments[i+1].replace(/[:]/g, "").trim();
             }
         }
 
-        // 5. Gender
         if(fullCombinedText.includes("पुरुष") || fullCombinedText.toLowerCase().includes("male")) {
-            document.getElementById('gender').value = "पुरुष / Male";
-        } else if(fullCombinedText.includes("महिला") || fullCombinedText.toLowerCase().includes("female")) {
