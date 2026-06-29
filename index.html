@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kisan Smart Farmer ID Generator (PDF Auto)</title>
-    <!-- PDF.js library for reading text from uploaded PDF -->
+    <title>UP Kisan Registry Smart Card Portal</title>
+    <!-- PDF.js Engine -->
     <script src="https://cloudflare.com"></script>
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #eef2f3; text-align: center; padding: 20px; margin: 0; }
@@ -16,7 +16,7 @@
         button:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .status-msg { font-size: 13px; font-weight: bold; color: #1565c0; margin-top: 5px; }
 
-        /* PVC Card Styling */
+        /* PVC Card Layout - Exactly like Video Smart Look */
         #pvc-card { 
             width: 85.6mm; height: 53.98mm; background: #ffffff; border: 1px solid #bcbcbc; border-radius: 10px; 
             margin: 40px auto; position: relative; text-align: left; box-sizing: border-box; overflow: hidden; display: none;
@@ -26,18 +26,18 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 38px;
             background: linear-gradient(135deg, #1b5e20 40%, #a3e635 85%, #2e7d32 100%);
             border-bottom-right-radius: 40px 15px; border-bottom-left-radius: 10px 5px;
-            color: white; font-weight: bold; font-size: 17px; padding: 8px 0 0 15px; box-sizing: border-box;
+            color: white; font-weight: bold; font-size: 16px; padding: 8px 0 0 15px; box-sizing: border-box;
         }
         .gov-logo { position: absolute; right: 10px; top: 4px; width: 30px; height: 30px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-        .card-body { padding: 45px 12px 10px 12px; font-size: 9px; color: #222222; font-weight: 600; line-height: 1.4; }
-        .info-row { margin: 2px 0; }
-        .info-row strong { color: #444; width: 70px; display: inline-block; font-size: 9.5px; }
+        .card-body { padding: 45px 12px 10px 12px; font-size: 9.5px; color: #222222; font-weight: 600; line-height: 1.4; }
+        .info-row { margin: 3px 0; }
+        .info-row strong { color: #444; width: 85px; display: inline-block; font-size: 9.5px; }
         .photo-frame { width: 55px; height: 68px; border: 1.5px solid #2e7d32; border-radius: 4px; background: #f0f0f0; position: absolute; left: 15px; top: 52px; overflow: hidden; }
         .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
-        .details-block { margin-left: 68px; margin-top: 5px; width: 160px; display: inline-block; vertical-align: top; }
+        .details-block { margin-left: 68px; margin-top: 2px; width: 165px; display: inline-block; vertical-align: top; }
         .qr-block { position: absolute; right: 12px; top: 52px; width: 62px; height: 62px; border: 1px solid #ddd; padding: 2px; background: white; border-radius: 4px; }
         .qr-block img { width: 100%; height: 100%; }
-        .center-id-number { position: absolute; bottom: 22px; left: 80px; font-size: 17px; font-weight: 800; color: #1b5e20; letter-spacing: 1.5px; }
+        .center-id-number { position: absolute; bottom: 22px; left: 80px; font-size: 16px; font-weight: 800; color: #1b5e20; letter-spacing: 1px; }
         .footer-text { position: absolute; bottom: 5px; left: 12px; font-size: 5px; color: #cc0000; font-weight: bold; width: 180px; line-height: 1.1; }
         .footer-capsule { position: absolute; bottom: 0; right: 0; background: linear-gradient(135deg, #1b5e20, #2e7d32); color: white; padding: 4px 15px; font-size: 11px; font-weight: bold; border-top-left-radius: 12px; }
 
@@ -51,46 +51,46 @@
 <body>
 
 <div class="form-container">
-    <h2>Farmer ID Card Generator Portal</h2>
+    <h2>UP Farmer ID Card Generator (Lucknow)</h2>
     
     <div class="upload-section">
-        <p style="margin:0 0 10px 0; font-weight:bold; color:#1b5e20;">Step 1: किसान रजिस्ट्री PDF स्लिप अपलोड करें</p>
-        <input type="file" id="pdfFile" accept="application/pdf" onchange="extractPdfData(event)">
+        <p style="margin:0 0 10px 0; font-weight:bold; color:#1b5e20;">Step 1: UP किसान रजिस्ट्री PDF स्लिप अपलोड करें</p>
+        <input type="file" id="pdfFile" accept="application/pdf" onchange="extractUPPdfData(event)">
         <div class="status-msg" id="statusMsg"></div>
     </div>
 
-    <p style="text-align:left; font-size:12px; color:#666; font-weight:bold; margin-bottom:5px;">Step 2: ऑटो-डेटा चेक करें या खुद भरें:</p>
-    <input type="text" id="nameEng" placeholder="Farmer Name (English)">
-    <input type="text" id="nameLocal" placeholder="किसान का नाम (हिंदी/स्थानीय भाषा)">
-    <input type="text" id="dob" placeholder="जन्मतिथि (DD/MM/YYYY)">
+    <p style="text-align:left; font-size:12px; color:#666; font-weight:bold; margin-bottom:5px;">Step 2: डेटा चेक करें या सुधारें:</p>
+    <input type="text" id="nameEng" placeholder="कृषक का नाम (English)">
+    <input type="text" id="fatherEng" placeholder="पिता/पति का नाम (Father Name)">
+    <input type="text" id="dob" placeholder="जन्मतिथि / आयु (DD/MM/YYYY)">
     <input type="text" id="gender" placeholder="लिंग / Gender">
     <input type="text" id="mobile" placeholder="मोबाइल नंबर (Mobile No.)">
-    <input type="text" id="farmerId" placeholder="आधार / किसान आईडी">
+    <input type="text" id="farmerId" placeholder="किसान रजिस्ट्री आईडी (12 अंक)">
     
     <p style="text-align:left; font-size:12px; color:#555; margin:10px 0 0 2px;">किसान की फोटो अपलोड करें (मैनुअली):</p>
     <input type="file" id="photo" accept="image/*" onchange="loadPhoto(event)">
-    <button onclick="buildKisanCard()">1-Click में कार्ड प्रिंट करें</button>
+    <button onclick="buildKisanCard()">1-Click में UP स्मार्ट कार्ड प्रिंट करें</button>
 </div>
 
 <div id="pvc-card">
-    <div class="card-header-wave">Agri Farmer</div>
+    <div class="card-header-wave">उत्तर प्रदेश किसान रजिस्ट्री</div>
     <div class="gov-logo">👨‍🌾</div>
     <div class="card-body">
         <div class="photo-frame"><img id="card-user-img" src="https://placeholder.com"></div>
         <div class="details-block">
-            <div class="info-row"><strong>Name:</strong> <span id="lbl-nameEng"></span></div>
-            <div class="info-row"><strong>नाव:</strong> <span id="lbl-nameLocal"></span></div>
-            <div class="info-row"><strong>DOB:</strong> <span id="lbl-dob"></span></div>
-            <div class="info-row"><strong>Gender:</strong> <span id="lbl-gender"></span></div>
-            <div class="info-row"><strong>मोबाइल नं:</strong> <span id="lbl-mobile"></span></div>
+            <div class="info-row"><strong>कृषक का नाम:</strong> <span id="lbl-nameEng"></span></div>
+            <div class="info-row"><strong>पिता/पति का नाम:</strong> <span id="lbl-fatherEng"></span></div>
+            <div class="info-row"><strong>जन्मतिथि/आयु:</strong> <span id="lbl-dob"></span></div>
+            <div class="info-row"><strong>लिंग / Gender:</strong> <span id="lbl-gender"></span></div>
+            <div class="info-row"><strong>मोबाइल नंबर:</strong> <span id="lbl-mobile"></span></div>
         </div>
         <div class="qr-block">
             <img src="" id="card-qr">
         </div>
         <div class="center-id-number" id="lbl-bigId"></div>
     </div>
-    <div class="footer-text">टीप : हे कार्ड शेतकऱ्याच्या वैयक्तिक माहितीसाठी असून, याला कोणतीही शासकीय मान्यता नाही.</div>
-    <div class="footer-capsule">Farmer ID</div>
+    <div class="footer-text">नोट: यह कार्ड केवल कृषक की पहचान एवं त्वरित संदर्भ के लिए एग्रीस्टैक डेटा आधारित है।</div>
+    <div class="footer-capsule">UP FARMER ID</div>
 </div>
 
 <script>
@@ -103,60 +103,64 @@
         fileReader.readAsDataURL(event.target.files);
     }
 
-    async function extractPdfData(event) {
+    async function extractUPPdfData(event) {
         const file = event.target.files[0];
         if (!file) return;
         
-        document.getElementById('statusMsg').innerText = "PDF पढ़ी जा रही है, कृपया रुकें...";
+        document.getElementById('statusMsg').innerText = "UP किसान रजिस्ट्री स्कैन हो रही है...";
         
         const fileReader = new FileReader();
         fileReader.onload = async function() {
             const typedarray = new Uint8Array(this.result);
             try {
                 const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                let textSegments = [];
+                
                 const page = await pdf.getPage(1);
                 const textContent = await page.getTextContent();
-                let fullText = textContent.items.map(item => item.str).join(" ");
+                textContent.items.forEach(item => {
+                    if(item.str.trim().length > 0) {
+                        textSegments.push(item.str.trim());
+                    }
+                });
                 
-                document.getElementById('statusMsg').innerText = "डेटा सफलतापूर्व निकाल लिया गया है!";
-                parseTextAndFillForm(fullText);
+                document.getElementById('statusMsg').innerText = "UP लखनऊ डेटा सफलतापूर्वक लोड हुआ!";
+                processUPFormat(textSegments);
             } catch (error) {
-                document.getElementById('statusMsg').innerText = "त्रुटि: PDF पढ़ने में समस्या आई।";
+                document.getElementById('statusMsg').innerText = "त्रुटि: PDF फाइल पढ़ने में दिक्कत आई।";
                 console.error(error);
             }
         };
         fileReader.readAsArrayBuffer(file);
     }
 
-    function parseTextAndFillForm(text) {
-        let idMatch = text.match(/\b\d{4}\s\d{4}\s\d{4}\b/) || text.match(/Farmer ID\s*:\s*([A-Za-z0-9-]+)/i) || text.match(/\b\d{12}\b/);
+    function processUPFormat(segments) {
+        let fullCombinedText = segments.join(" ");
+        
+        // 1. Extract 12 Digit UP Farmer Registry ID
+        let idMatch = fullCombinedText.match(/\b\d{12}\b/) || fullCombinedText.match(/\b\d{4}\s\d{4}\s\d{4}\b/);
         if(idMatch) document.getElementById('farmerId').value = idMatch[0];
 
-        let mobMatch = text.match(/\b[6-9]\d{9}\b/) || text.match(/Mobile\s*:\s*(\d{10})/i);
+        // 2. Extract Mobile Number
+        let mobMatch = fullCombinedText.match(/\b[6-9]\d{9}\b/);
         if(mobMatch) document.getElementById('mobile').value = mobMatch[0];
 
-        let dobMatch = text.match(/\b\d{2}\/\d{2}\/\d{4}\b/);
+        // 3. Extract Date of Birth / Age
+        let dobMatch = fullCombinedText.match(/\b\d{2}\/\d{2}\/\d{4}\b/) || fullCombinedText.match(/आयु\s*:\s*(\d+)/);
         if(dobMatch) document.getElementById('dob').value = dobMatch[0];
 
-        if(text.includes("Name")) {
-            let parts = text.split(/Name\s*:/i);
-            if(parts[1]) {
-                let nameBlock = parts[1].trim().split("  ")[0];
-                document.getElementById('nameEng').value = nameBlock;
-                document.getElementById('nameLocal').value = nameBlock;
+        // 4. Extract Name and Father Name based on UP Government Text Indexing
+        for(let i = 0; i < segments.length; i++) {
+            let currentStr = segments[i].replace(/[:]/g, "").trim();
+            
+            if(currentStr.includes("कृषक का नाम") || currentStr.includes("Farmer Name")) {
+                document.getElementById('nameEng').value = segments[i+1] ? segments[i+1].replace(/[:]/g, "").trim() : "";
+            }
+            if(currentStr.includes("पिता") || currentStr.includes("पति का नाम") || currentStr.includes("Father")) {
+                document.getElementById('fatherEng').value = segments[i+1] ? segments[i+1].replace(/[:]/g, "").trim() : "";
             }
         }
-        
-        if(text.toLowerCase().includes("male") || text.includes("पुरुष")) document.getElementById('gender').value = "पुरुष / Male";
-        else if(text.toLowerCase().includes("female") || text.includes("महिला")) document.getElementById('gender').value = "महिला / Female";
-    }
 
-    function buildKisanCard() {
-        document.getElementById('lbl-nameEng').innerText = document.getElementById('nameEng').value || "Abcd Efgh";
-        document.getElementById('lbl-nameLocal').innerText = document.getElementById('nameLocal').value || "किसान नाम";
-        document.getElementById('lbl-dob').innerText = document.getElementById('dob').value || "01/01/1980";
-        document.getElementById('lbl-gender').innerText = document.getElementById('gender').value || "Male";
-        document.getElementById('lbl-mobile').innerText = document.getElementById('mobile').value || "99999XXXXX";
-        
-        let idVal = document.getElementById('farmerId').value || "0000 0000 0000";
-        document.getElementById('lbl-bigId').innerText = idVal;
+        // 5. Extract Gender
+        if(fullCombinedText.includes("पुरुष") || fullCombinedText.toLowerCase().includes("male")) {
+            document.getElementById('gender').value = "पुरुष / Male";
