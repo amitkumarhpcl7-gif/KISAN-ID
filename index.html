@@ -3,101 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UP Kisan Registry Smart Card Portal</title>
-    <!-- Stable Official Worker Setup -->
-    <script src="https://cloudflare.com"></script>
+    <title>UP Kisan Registry Smart Card Portal (Multi-Khasra)</title>
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #eef2f3; text-align: center; padding: 20px; margin: 0; }
         .form-container { max-width: 480px; background: white; padding: 25px; margin: 20px auto; border-radius: 12px; box-shadow: 0px 5px 20px rgba(0,0,0,0.15); border-top: 5px solid #2e7d32; }
         .form-container h2 { color: #2e7d32; margin-bottom: 20px; font-size: 22px; }
-        .upload-section { background: #f1f8e9; padding: 15px; border: 2px dashed #2e7d32; border-radius: 8px; margin-bottom: 20px; }
-        input, select { width: 100%; padding: 11px; margin: 10px 0; border: 1px solid #cccccc; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
-        button { background: linear-gradient(135deg, #2e7d32, #1b5e20); color: white; border: none; padding: 13px; cursor: pointer; font-size: 16px; font-weight: bold; border-radius: 6px; width: 100%; margin-top: 10px; transition: 0.3s; }
-        button:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .status-msg { font-size: 14px; font-weight: bold; color: #d32f2f; margin-top: 5px; background: #ffebee; padding: 5px; border-radius: 4px; display: none; }
+        input, select { width: 100%; padding: 11px; margin: 8px 0; border: 1px solid #cccccc; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+        .section-title { text-align: left; font-size: 13px; font-weight: bold; color: #1b5e20; margin-top: 15px; margin-bottom: 2px; }
+        
+        /* Multi Khasra Row Styling */
+        .khasra-group { display: flex; gap: 10px; margin: 5px 0; }
+        .khasra-group input { margin: 0; }
+        .add-btn { background: #1565c0; color: white; border: none; padding: 8px 12px; cursor: pointer; border-radius: 4px; font-size: 12px; font-weight: bold; margin-bottom: 10px; display: inline-block; float: left; }
+        
+        button.print-btn { background: linear-gradient(135deg, #2e7d32, #1b5e20); color: white; border: none; padding: 13px; cursor: pointer; font-size: 16px; font-weight: bold; border-radius: 6px; width: 100%; margin-top: 15px; clear: both; }
+        button.print-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
 
-        /* PVC Card Layout */
-        #pvc-card { 
+        .print-area { display: none; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 30px; }
+
+        /* Universal PVC Card Layout */
+        .pvc-card-layout { 
             width: 85.6mm; height: 53.98mm; background: #ffffff; border: 1px solid #bcbcbc; border-radius: 10px; 
-            margin: 40px auto; position: relative; text-align: left; box-sizing: border-box; overflow: hidden; display: none;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            position: relative; text-align: left; box-sizing: border-box; overflow: hidden;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15); background-image: radial-gradient(#e8f5e9 1px, transparent 1px); background-size: 8px 8px;
         }
-        .card-header-wave { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 38px;
+        
+        .header-wave { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 35px;
             background: linear-gradient(135deg, #1b5e20 40%, #a3e635 85%, #2e7d32 100%);
             border-bottom-right-radius: 40px 15px; border-bottom-left-radius: 10px 5px;
-            color: white; font-weight: bold; font-size: 16px; padding: 8px 0 0 15px; box-sizing: border-box;
+            color: white; font-weight: bold; font-size: 14px; padding: 8px 0 0 12px; box-sizing: border-box;
         }
-        .gov-logo { position: absolute; right: 10px; top: 4px; width: 30px; height: 30px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-        .card-body { padding: 45px 12px 10px 12px; font-size: 9.5px; color: #222222; font-weight: 600; line-height: 1.4; }
-        .info-row { margin: 3px 0; }
-        .info-row strong { color: #444; width: 85px; display: inline-block; font-size: 9.5px; }
-        .photo-frame { width: 55px; height: 68px; border: 1.5px solid #2e7d32; border-radius: 4px; background: #f0f0f0; position: absolute; left: 15px; top: 52px; overflow: hidden; }
+        .gov-logo { position: absolute; right: 10px; top: 4px; width: 25px; height: 25px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+        
+        /* Front Body */
+        .card-body-front { padding: 42px 12px 10px 12px; font-size: 9px; color: #222222; font-weight: 600; line-height: 1.4; }
+        .info-row { margin: 2px 0; }
+        .info-row strong { color: #444; width: 80px; display: inline-block; }
+        .photo-frame { width: 52px; height: 65px; border: 1.5px solid #2e7d32; border-radius: 4px; background: #f0f0f0; position: absolute; left: 12px; top: 48px; overflow: hidden; }
         .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
-        .details-block { margin-left: 68px; margin-top: 2px; width: 165px; display: inline-block; vertical-align: top; }
-        .qr-block { position: absolute; right: 12px; top: 52px; width: 62px; height: 62px; border: 1px solid #ddd; padding: 2px; background: white; border-radius: 4px; }
+        .details-block { margin-left: 62px; margin-top: 2px; width: 165px; display: inline-block; vertical-align: top; }
+        .qr-block { position: absolute; right: 12px; top: 48px; width: 58px; height: 58px; border: 1px solid #ddd; padding: 2px; background: white; border-radius: 4px; }
         .qr-block img { width: 100%; height: 100%; }
-        .center-id-number { position: absolute; bottom: 22px; left: 80px; font-size: 16px; font-weight: 800; color: #1b5e20; letter-spacing: 1px; }
-        .footer-text { position: absolute; bottom: 5px; left: 12px; font-size: 5px; color: #cc0000; font-weight: bold; width: 180px; line-height: 1.1; }
-        .footer-capsule { position: absolute; bottom: 0; right: 0; background: linear-gradient(135deg, #1b5e20, #2e7d32); color: white; padding: 4px 15px; font-size: 11px; font-weight: bold; border-top-left-radius: 12px; }
+        .center-id-number { position: absolute; bottom: 20px; left: 78px; font-size: 15px; font-weight: 800; color: #1b5e20; letter-spacing: 1px; }
+        
+        /* Back Body with Land Table */
+        .card-body-back { padding: 42px 12px 10px 12px; font-size: 9.5px; color: #222222; font-weight: 600; }
+        .address-text { font-size: 9.5px; margin-bottom: 5px; border-bottom: 1px solid #ddd; padding-bottom: 3px; }
+        .address-text strong { color: #1b5e20; }
+        
+        .land-table { width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 9px; }
+        .land-table th, .land-table td { border: 0.5px solid #aaa; text-align: center; padding: 2px; }
+        .land-table th { background-color: #f1f8e9; color: #1b5e20; font-weight: bold; }
+        
+        .footer-text { position: absolute; bottom: 4px; left: 12px; font-size: 5px; color: #cc0000; font-weight: bold; width: 220px; line-height: 1.1; }
+        .footer-capsule { position: absolute; bottom: 0; right: 0; background: linear-gradient(135deg, #1b5e20, #2e7d32); color: white; padding: 3px 12px; font-size: 10px; font-weight: bold; border-top-left-radius: 10px; }
 
         @media print {
             body * { visibility: hidden; }
-            #pvc-card, #pvc-card * { visibility: visible; }
-            #pvc-card { position: absolute; left: 0; top: 0; box-shadow: none; border: 1px solid #000; display: block !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .print-area, .print-area * { visibility: visible; }
+            .print-area { display: flex !important; position: absolute; left: 0; top: 0; box-shadow: none; gap: 20px; }
+            .pvc-card-layout { box-shadow: none; border: 1px solid #000; page-break-inside: avoid; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
 </head>
 <body>
 
 <div class="form-container">
-    <h2>UP Farmer ID Card Generator (Lucknow)</h2>
+    <h2>UP Farmer ID Card Portal (Lucknow)</h2>
     
-    <div class="upload-section">
-        <p style="margin:0 0 10px 0; font-weight:bold; color:#1b5e20;">Step 1: UP किसान रजिस्ट्री PDF स्लिप अपलोड करें</p>
-        <input type="file" id="pdfFile" accept="application/pdf" onchange="extractUPPdfData(event)">
-        <div class="status-msg" id="statusMsg"></div>
-    </div>
-
-    <p style="text-align:left; font-size:12px; color:#666; font-weight:bold; margin-bottom:5px;">Step 2: डेटा चेक करें या सुधारें:</p>
+    <div class="section-title">सामने का भाग (Front Side Details):</div>
     <input type="text" id="nameEng" placeholder="कृषक का नाम (Farmer Name)">
     <input type="text" id="fatherEng" placeholder="पिता/पति का नाम (Father Name)">
     <input type="text" id="dob" placeholder="जन्मतिथि / आयु (DD/MM/YYYY)">
-    <input type="text" id="gender" placeholder="लिंग / Gender">
+    <input type="text" id="gender" placeholder="लिंग (Gender) - पुरुष / महिला">
     <input type="text" id="mobile" placeholder="मोबाइल नंबर (Mobile No.)">
     <input type="text" id="farmerId" placeholder="किसान रजिस्ट्री आईडी (12 अंक)">
-    
-    <p style="text-align:left; font-size:12px; color:#555; margin:10px 0 0 2px;">किसान की फोटो अपलोड करें (मैनुअली):</p>
     <input type="file" id="photo" accept="image/*" onchange="loadPhoto(event)">
-    <button onclick="buildKisanCard()">1-Click में UP स्मार्ट कार्ड प्रिंट करें</button>
+    
+    <div class="section-title">पीछे का भाग (Address & District):</div>
+    <input type="text" id="village" placeholder="ग्राम का नाम (Village)">
+    <input type="text" id="tehsil" placeholder="तहसील (Tehsil)">
+    <input type="text" id="district" placeholder="जनपद / जिला (District)" value="लखनऊ">
+    
+    <div class="section-title">भूमि का विवरण (Multiple Khasra & Land Area):</div>
+    <div id="kisan-khasra-container">
+        <div class="khasra-group">
+            <input type="text" class="khasra-num" placeholder="खसरा नंबर (उदा. 124)">
+            <input type="text" class="khasra-area" placeholder="जमीन रकबा हेक्ट. में (उदा. 0.450)">
+        </div>
+    </div>
+    <button class="add-btn" onclick="addNewKhasraRow()">+ और खसरा नंबर जोड़ें</button>
+
+    <button class="print-btn" onclick="buildBothSidesCard()">1-Click में Front & Back कार्ड प्रिंट करें</button>
 </div>
 
-<div id="pvc-card">
-    <div class="card-header-wave">उत्तर प्रदेश किसान रजिस्ट्री</div>
-    <div class="gov-logo">👨‍🌾</div>
-    <div class="card-body">
-        <div class="photo-frame"><img id="card-user-img" src="https://placeholder.com"></div>
-        <div class="details-block">
-            <div class="info-row"><strong>कृषक का नाम:</strong> <span id="lbl-nameEng"></span></div>
-            <div class="info-row"><strong>पिता/पति का नाम:</strong> <span id="lbl-fatherEng"></span></div>
-            <div class="info-row"><strong>जन्मतिथि/आयु:</strong> <span id="lbl-dob"></span></div>
-            <div class="info-row"><strong>लिंग / Gender:</strong> <span id="lbl-gender"></span></div>
-            <div class="info-row"><strong>मोबाइल नंबर:</strong> <span id="lbl-mobile"></span></div>
+<!-- Print Preview Layout Container -->
+<div class="print-area" id="mainPrintArea">
+    
+    <!-- FRONT CARD -->
+    <div class="pvc-card-layout">
+        <div class="header-wave">उत्तर प्रदेश किसान रजिस्ट्री</div>
+        <div class="gov-logo">👨‍🌾</div>
+        <div class="card-body-front">
+            <div class="photo-frame"><img id="card-user-img" src="https://placeholder.com"></div>
+            <div class="details-block">
+                <div class="info-row"><strong>कृषक का नाम:</strong> <span id="lbl-nameEng"></span></div>
+                <div class="info-row"><strong>पिता/पति का नाम:</strong> <span id="lbl-fatherEng"></span></div>
+                <div class="info-row"><strong>जन्मतिथि/आयु:</strong> <span id="lbl-dob"></span></div>
+                <div class="info-row"><strong>लिंग / Gender:</strong> <span id="lbl-gender"></span></div>
+                <div class="info-row"><strong>मोबाइल नंबर:</strong> <span id="lbl-mobile"></span></div>
+            </div>
+            <div class="qr-block">
+                <img src="" id="card-qr">
+            </div>
+            <div class="center-id-number" id="lbl-bigId"></div>
         </div>
-        <div class="qr-block">
-            <img src="" id="card-qr">
-        </div>
-        <div class="center-id-number" id="lbl-bigId"></div>
+        <div class="footer-text">नोट: यह कार्ड केवल कृषक की पहचान एवं त्वरित संदर्भ के लिए एग्रीस्टैक डेटा आधारित है।</div>
+        <div class="footer-capsule">FRONT</div>
     </div>
-    <div class="footer-text">नोट: यह कार्ड केवल कृषक की पहचान एवं त्वरित संदर्भ के लिए एग्रीस्टैक डेटा आधारित है।</div>
-    <div class="footer-capsule">UP FARMER ID</div>
+
+    <!-- BACK CARD -->
+    <div class="pvc-card-layout">
+        <div class="header-wave">भूमि एवं निवास का विवरण</div>
+        <div class="gov-logo">🏠</div>
+        <div class="card-body-back">
+            <div class="address-text">
+                <strong>पता:</strong> ग्राम- <span id="lbl-village"></span>, तहसील- <span id="lbl-tehsil"></span>, जनपद- <span id="lbl-district"></span>
+            </div>
+            
+            <!-- Dynamic Khasra Land Table -->
+            <table class="land-table">
+                <thead>
+                    <tr>
+                        <th>क्र.सं.</th>
+                        <th>खसरा / खाता संख्या</th>
+                        <th>क्षेत्रफल (हेक्टेयर)</th>
+                    </tr>
+                </thead>
+                <tbody id="lbl-land-rows">
+                    <!-- Dynamic Rows Insertion -->
+                </tbody>
+            </table>
+        </div>
+        <div class="footer-text">यह कार्ड डिजिटल रूप से हस्ताक्षरित डेटा पर आधारित है। खोने पर एग्रीस्टैक पोर्टल से पुनः प्राप्त करें।</div>
+        <div class="footer-capsule">BACK</div>
+    </div>
+
 </div>
 
 <script>
-    // Self-contained library configuration 
-    const pdfjsLib = window['pdfjs-dist/build/pdf'];
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cloudflare.com';
-    
     let uploadedImgBase64 = "";
 
     function loadPhoto(event) {
@@ -106,65 +161,10 @@
         fileReader.readAsDataURL(event.target.files);
     }
 
-    function showStatus(msg, isColor = "#1565c0") {
-        let el = document.getElementById('statusMsg');
-        el.innerText = msg;
-        el.style.backgroundColor = isColor === "#1565c0" ? "#e3f2fd" : "#ffebee";
-        el.style.color = isColor;
-        el.style.display = 'block';
-    }
-
-    async function extractUPPdfData(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        
-        showStatus("UP किसान रजिस्ट्री स्कैन हो रही है... कृपया रुकें");
-        
-        const fileReader = new FileReader();
-        fileReader.onload = async function() {
-            const typedarray = new Uint8Array(this.result);
-            try {
-                const pdf = await pdfjsLib.getDocument({data: typedarray}).promise;
-                let textSegments = [];
-                
-                const page = await pdf.getPage(1);
-                const textContent = await page.getTextContent();
-                textContent.items.forEach(item => {
-                    if(item.str.trim().length > 0) {
-                        textSegments.push(item.str.trim());
-                    }
-                });
-                
-                showStatus("UP लखनऊ डेटा सफलतापूर्वक लोड हुआ!", "#2e7d32");
-                processUPFormat(textSegments);
-            } catch (error) {
-                showStatus("त्रुटि: ब्राउज़र रीफ्रेश करके दोबारा अपलोड करें।", "#d32f2f");
-                console.error(error);
-            }
-        };
-        fileReader.readAsArrayBuffer(file);
-    }
-
-    function processUPFormat(segments) {
-        let fullCombinedText = segments.join(" ");
-        
-        let idMatch = fullCombinedText.match(/\b\d{12}\b/) || fullCombinedText.match(/\b\d{4}\s\d{4}\s\d{4}\b/);
-        if(idMatch) document.getElementById('farmerId').value = idMatch[0];
-
-        let mobMatch = fullCombinedText.match(/\b[6-9]\d{9}\b/);
-        if(mobMatch) document.getElementById('mobile').value = mobMatch[0];
-
-        let dobMatch = fullCombinedText.match(/\b\d{2}\/\d{2}\/\d{4}\b/);
-        if(dobMatch) document.getElementById('dob').value = dobMatch[0];
-
-        for(let i = 0; i < segments.length; i++) {
-            let currentStr = segments[i].replace(/[:]/g, "").trim();
-            if(currentStr === "कृषक का नाम" || currentStr === "Farmer Name") {
-                if(segments[i+1]) document.getElementById('nameEng').value = segments[i+1].replace(/[:]/g, "").trim();
-            }
-            if(currentStr.includes("पिता") || currentStr.includes("पति का नाम") || currentStr.includes("Father")) {
-                if(segments[i+1]) document.getElementById('fatherEng').value = segments[i+1].replace(/[:]/g, "").trim();
-            }
-        }
-
-        if(fullCombinedText.includes("पुरुष") || fullCombinedText.toLowerCase().includes("male")) {
+    // Function to add extra Khasra fields dynamically
+    function addNewKhasraRow() {
+        let container = document.getElementById('kisan-khasra-container');
+        let newRow = document.createElement('div');
+        newRow.className = 'khasra-group';
+        newRow.innerHTML = `
+            <input type="text" class="khasra-num" placeholder="खसरा नंबर">
